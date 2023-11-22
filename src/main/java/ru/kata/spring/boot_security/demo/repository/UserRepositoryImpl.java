@@ -14,6 +14,7 @@ import ru.kata.spring.boot_security.demo.model.User;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,6 +49,12 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void addUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        List<Role> rolesss = new ArrayList<>();
+        for (Role role1 : user.getRoles()) {
+            Role role = entityManager.find(Role.class, role1.getRoleId());
+            rolesss.add(role);
+        }
+        user.setRoles(rolesss);
         entityManager.persist(user);
     }
 
@@ -60,13 +67,22 @@ public class UserRepositoryImpl implements UserRepository {
             existingUser.setAge(user.getAge());
             if (!user.getPassword().isEmpty())
                 existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
-            existingUser.setRoles(user.getRoles());
+            List<Role> rolesss = new ArrayList<>();
+            for (Role role1 : user.getRoles()) {
+                Role role = entityManager.find(Role.class, role1.getRoleId());
+                rolesss.add(role);
+            }
+            existingUser.setRoles(rolesss);
         }
     }
 
     @Override
+    @Transactional
     public void removeUser(long id) {
         User existingUser = entityManager.find(User.class, id);
+        if (existingUser != null && existingUser.getRoles() != null) {
+            existingUser.getRoles().clear();
+        }
         entityManager.remove(existingUser);
     }
 

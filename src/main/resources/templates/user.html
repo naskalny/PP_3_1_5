@@ -13,11 +13,9 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
     <div class="container-fluid">
         <span class="navbar-brand">
-                <span class="fw-bold" th:text="${user.getUsername()}"></span>
-                <span> with roles: </span>
-                <span th:each="role : ${user.getRoles()}"
-                      th:text="${role.getName().replace('ROLE_', '') + ' '}">
-                </span>
+            <span class="fw-bold" id="authHeader"></span>
+            <span> with roles: </span>
+            <span id="authRoles"></span>
             </span>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav ms-auto">
@@ -60,25 +58,14 @@
                                 <thead class="border-top">
                                 <tr>
                                     <th scope="col">ID</th>
+                                    <th scope="col">Username</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Surname</th>
                                     <th scope="col">Age</th>
                                     <th scope="col">Role</th>
                                 </tr>
                                 </thead>
-                                <tbody>
-                                <tr>
-                                    <td th:utext="${user.id}"></td>
-                                    <td th:utext="${user.name}"></td>
-                                    <td th:utext="${user.surname}"></td>
-                                    <td th:utext="${user.age}"></td>
-                                    <td>
-                                <span th:each="role : ${user.getRoles()}"
-                                      th:text="${role.getName().replace('ROLE_', '') + ' '}">
-                                </span>
-                                    </td>
-                                </tr>
-
+                                <tbody id="currentUserInfo">
                                 </tbody>
                             </table>
 
@@ -96,9 +83,11 @@
         $('[data-dismiss="modal"]').click(function () {
             $('.modal').modal('hide');
         });
+        fillHeader();
     });
 </script>
 </body>
 </html>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/script.js"></script>
