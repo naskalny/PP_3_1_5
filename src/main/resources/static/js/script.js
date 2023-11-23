@@ -64,8 +64,8 @@ async function editFunc(value) {
     select.empty()
     $("#edit-id").val(editedUser.id)
     $("#edit-username").val(editedUser.username)
-    $("#edit-name").val(editedUser.name) // --------------------
-    $("#edit-Surname").val(editedUser.surname) // --------------------
+    $("#edit-name").val(editedUser.name)
+    $("#edit-Surname").val(editedUser.surname)
     $("#edit-Age").val(editedUser.age)
     let roles = await fetch("api/roles")
         .then(response => response.json())
@@ -91,7 +91,12 @@ async function editFunc(value) {
 
 document.getElementById('submitEdit').addEventListener('click', async function() {
     var userId = document.getElementById('edit-id').value;
-    // Сбор данных из полей модального окна
+    var nameInput = document.getElementById('edit-name');
+    var surnameInput = document.getElementById('edit-Surname');
+    var ageInput = document.getElementById('edit-Age');
+    nameInput.classList.remove('is-invalid');
+    surnameInput.classList.remove('is-invalid');
+    ageInput.classList.remove('is-invalid');
     var userData = {
         id: userId,
         username: document.getElementById('edit-username').value,
@@ -111,13 +116,40 @@ document.getElementById('submitEdit').addEventListener('click', async function()
                 })
         }
     }
-
     await updateUserData(userId, userData)
         .then(response => {
-            console.log('Данные успешно обновлены:', response);
-            loadusers();
-            fillHeader();
-            $("#editModal").modal("hide")
+            if (!response.ok) {
+                return response.text().then(error => {
+                    const errorMessage = error.split(";");
+
+                    var nameValidationMessage = document.getElementById('nameEditValidationMessage');
+                    var surnameValidationMessage = document.getElementById('surnameEditValidationMessage');
+                    var ageValidationMessage = document.getElementById('ageEditValidationMessage');
+
+                    errorMessage.forEach(errorMsg=>{
+                        var regex = /^(name|surname|age)\b/i;
+                        var firstWordMatch = errorMsg.match(regex);
+                        var firstWord = firstWordMatch[0].toLowerCase();
+                        if (firstWord == "surname"){
+                            surnameValidationMessage.innerHTML = errorMsg;
+                            surnameInput.classList.add('is-invalid');
+                        }
+                        if (firstWord == "name"){
+                            nameValidationMessage.innerHTML = errorMessage;
+                            nameInput.classList.add('is-invalid');
+                        }
+                        if (firstWord == "age"){
+                            ageValidationMessage.innerHTML = errorMessage;
+                            ageInput.classList.add('is-invalid');
+                        }
+                    })
+                });
+            } else {
+                console.log('Данные успешно обновлены:', response);
+                loadusers();
+                fillHeader();
+                $("#editModal").modal("hide")
+            }
 
         })
         .catch(error => console.error('Ошибка обновления данных:', error));
@@ -144,8 +176,8 @@ async function deleteFunc(value) {
     select.empty()
     $("#delete-id").val(editedUser.id)
     $("#delete-username").val(editedUser.username)
-    $("#delete-name").val(editedUser.name) // --------------------
-    $("#delete-Surname").val(editedUser.surname) // --------------------
+    $("#delete-name").val(editedUser.name)
+    $("#delete-Surname").val(editedUser.surname)
     $("#delete-Age").val(editedUser.age)
     let roles = await fetch("api/roles")
         .then(response => response.json())
@@ -245,6 +277,12 @@ async function fillRoles(){
 }
 
 document.getElementById('createUserButton').addEventListener('click', async function() {
+    var nameInput = document.getElementById('new_name');
+    var surnameInput = document.getElementById('new_surname');
+    var ageInput = document.getElementById('new_age');
+    nameInput.classList.remove('is-invalid');
+    surnameInput.classList.remove('is-invalid');
+    ageInput.classList.remove('is-invalid');
     var userId = document.getElementById('delete-id').value;
 
     var userData = {
@@ -266,16 +304,49 @@ document.getElementById('createUserButton').addEventListener('click', async func
                 })
         }
     }
-
     await createUser(userId, userData)
         .then(response => {
-            console.log('Данные успешно обновлены:', response);
-            loadusers();
-            $("#myTabs a[href='#content1']").tab('show');
-            $('.d-grid input:not(:last), .d-grid select').val('');
-            $('.d-grid select').val('');
+            if (!response.ok) {
+                return response.text().then(error => {
+                     const errorMessage = error.split(";");
+
+                     var nameValidationMessage = document.getElementById('nameValidationMessage');
+                     var surnameValidationMessage = document.getElementById('surnameValidationMessage');
+                     var ageValidationMessage = document.getElementById('ageValidationMessage');
+
+                     errorMessage.forEach(errorMsg=>{
+                         var regex = /^(name|surname|age)\b/i;
+                         var firstWordMatch = errorMsg.match(regex);
+                         var firstWord = firstWordMatch[0].toLowerCase();
+                         if (firstWord == "surname"){
+                             surnameValidationMessage.innerHTML = errorMsg;
+                             surnameInput.classList.add('is-invalid');
+                         }
+                         if (firstWord == "name"){
+                             nameValidationMessage.innerHTML = errorMessage;
+                             nameInput.classList.add('is-invalid');
+                         }
+                         if (firstWord == "age"){
+                             ageValidationMessage.innerHTML = errorMessage;
+                             ageInput.classList.add('is-invalid');
+                         }
+                     })
+
+
+                    console.log(errorMessage);
+                });
+            } else {
+                console.log('Данные успешно обновлены:', response);
+                loadusers();
+                $("#myTabs a[href='#content1']").tab('show');
+                $('.d-grid input:not(:last), .d-grid select').val('');
+                $('.d-grid select').val('');
+            }
+
         })
-        .catch(error => console.error('Ошибка обновления данных:', error));
+        .catch(error => {
+            console.error('Ошибка обновления данных:', error);
+        });
 });
 
 async function createUser(userId, userData) {

@@ -41,7 +41,7 @@ public class FirstRestController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid User user,
+    public ResponseEntity<String> create(@RequestBody @Valid User user,
                                              BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             StringBuilder errorMsg = new StringBuilder();
@@ -51,13 +51,14 @@ public class FirstRestController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
+            return ResponseEntity.badRequest().body(errorMsg.toString().substring(0, errorMsg.toString().length()-1));
         }
         userService.addUser(user);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return ResponseEntity.ok("User created successfully");
     }
 
     @PatchMapping("/users/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable("id") long id,
+    public ResponseEntity<String> update(@PathVariable("id") long id,
                                              @RequestBody @Valid User user,
                                              BindingResult bindingResult) {
         System.out.println("Received PATCH request for user ID: " + id);
@@ -69,10 +70,10 @@ public class FirstRestController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            System.out.println(errorMsg);
+            return ResponseEntity.badRequest().body(errorMsg.toString().substring(0, errorMsg.toString().length()-1));
         }
         userService.editUser(user);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return ResponseEntity.ok("User updated successfully");
     }
 
     @DeleteMapping("/users/{id}")

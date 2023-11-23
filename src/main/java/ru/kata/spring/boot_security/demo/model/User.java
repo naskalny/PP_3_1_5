@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -19,9 +20,11 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "name")
+    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "The name must contain only letters")
     @NotBlank(message = "The field must not have zero and no more than 50 characters")
     private String name;
     @Column(name = "surname")
+    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "The name must contain only letters")
     @NotBlank(message = "The field must not have zero and no more than 50 characters")
     private String surname;
     @Min(value = 0, message = "Age should be greater than 0")
